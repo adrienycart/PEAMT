@@ -3,6 +3,7 @@ import numpy as np
 import pretty_midi as pm
 import mir_eval
 import matplotlib.pyplot as plt
+import argparse
 import features.utils as utils
 from features.benchmark import framewise, notewise
 from features.high_low_voice import framewise_highest, framewise_lowest, notewise_highest, notewise_lowest
@@ -23,14 +24,29 @@ except:
     # python 3
     import pickle
 
-MIDI_path = 'data/all_midi_cut'
+
+parser = argparse.ArgumentParser()
+parser.add_argument('input_midi',type=str,help="folder containing all the cut MIDI files")
+parser.add_argument('input_answers',type=str,help="CSV filename containing all the participants' answers")
+parser.add_argument('output',type=str,help="folder to save the precomputed features (will be created if it does not exist)")
+parser.add_argument('--consonance', type=str, help='location of precomputed consonance features (if used)')
+parser.add_argument('--all_thresholds',action='store_true',help='precompute benchmark metrics with various thresholds')
+
+args = parser.parse_args()
+
+
+MIDI_path = args.input_midi
 systems = ['kelz', 'lisu', 'google', 'cheng']
 
 fs=100
 
-precomputed_consonance_path = 'features/consonance_statistics_no_empty_chords'
+if args.consonance is None:
+    precomputed_consonance_path = None
+else:
+    precomputed_consonance_path = args.consonance
 
-write_path = 'data/precomputed_features_cons_nozero_correcthighlow'
+write_path = args.output
+os.makedirs(write_path, exist_ok=True)
 
 all_dicts = []
 
@@ -72,14 +88,20 @@ for i,example in enumerate(example_paths):
         frame = framewise(output,target)
 
         #### Investigate various frame sizes
-        for f in [0.05,0.075,0.1,0.15]:
-            times = np.arange(0,max(target_data.get_end_time(),system_data.get_end_time()),f)
-            roll_target = utils.get_roll_from_times(target_data,times)
-            roll_output = utils.get_roll_from_times(system_data,times)
-            result = framewise(roll_target,roll_output)
-            results_dict.update({'framewise_'+str(f): result})
+        if args.all_thresholds:
+            for f in [0.05,0.075,0.1,0.15]:
+                times = np.arange(0,max(target_data.get_end_time(),system_data.get_end_time()),f)
+                roll_target = utils.get_roll_from_times(target_data,times)
+                roll_output = utils.get_roll_from_times(system_data,times)
+                result = framewise(roll_target,roll_output)
+                results_dict.update({'framewise_'+str(f): result})
 
-        for on_tol in [25,50,75,100,125,150]:
+        if args.all_thresholds:
+            on_tols = [25,50,75,100,125,150]
+        else:
+            on_tols = [50]
+
+        for on_tol in on_tols:
             match_on = mir_eval.transcription.match_notes(intervals_target, notes_target, intervals_output, notes_output, onset_tolerance=on_tol/1000.0, offset_ratio=None, pitch_tolerance=0.25)
             if on_tol == 50:
                 match = match_on
@@ -88,8 +110,15 @@ for i,example in enumerate(example_paths):
 
         match_no_pedal = mir_eval.transcription.match_notes(intervals_target_no_pedal, notes_target_no_pedal, intervals_output, notes_output, onset_tolerance=0.05, offset_ratio=None, pitch_tolerance=0.25)
 
-        for on_tol in [25,50,75,100,125,150]:
-            for off_tol in [0.1,0.2,0.3,0.4,0.5]:
+        if args.all_thresholds:
+            on_tols = [25,50,75,100,125,150]
+            off_tols = [0.1,0.2,0.3,0.4,0.5]
+        else:
+            on_tols = [50]
+            off_tols = [0.2]
+
+        for on_tol in on_tols:
+            for off_tol in off_tols:
                 match_onoff = mir_eval.transcription.match_notes(intervals_target, notes_target, intervals_output, notes_output,onset_tolerance=on_tol/1000.0, offset_ratio=off_tol, pitch_tolerance=0.25)
                 note = notewise(match_onoff,notes_output,notes_target)
                 results_dict.update({'notewise_OnOff_'+str(on_tol)+'_'+str(object=off_tol): note})
@@ -133,24 +162,6 @@ for i,example in enumerate(example_paths):
         rhythm_hist = rhythm_histogram(intervals_output,intervals_target)
         rhythm_disp_std,rhythm_disp_drift = rhythm_dispersion(intervals_output, intervals_target)
 
-        #Import consonance features
-        consonance_target = pickle.load(open(os.path.join(precomputed_consonance_path,example,'target.pkl'),'rb'))
-        consonance_output = pickle.load(open(os.path.join(precomputed_consonance_path,example,system+'.pkl'),'rb'))
-
-        cons_hut78_target = [consonance_target[0],consonance_target[3],consonance_target[6],consonance_target[9]]
-        cons_har18_target = [consonance_target[1],consonance_target[4],consonance_target[7],consonance_target[10]]
-        cons_har19_target = [consonance_target[2],consonance_target[5],consonance_target[8],consonance_target[11]]
-
-        cons_hut78_output = [consonance_output[0],consonance_output[3],consonance_output[6],consonance_output[9]]
-        cons_har18_output = [consonance_output[1],consonance_output[4],consonance_output[7],consonance_output[10]]
-        cons_har19_output = [consonance_output[2],consonance_output[5],consonance_output[8],consonance_output[11]]
-
-        cons_hut78_diff = [c1-c2 for (c1,c2) in zip(cons_hut78_output,cons_hut78_target)]
-        cons_har18_diff = [c1-c2 for (c1,c2) in zip(cons_har18_output,cons_har18_target)]
-        cons_har19_diff = [c1-c2 for (c1,c2) in zip(cons_har19_output,cons_har19_target)]
-
-        # all_cons += [[cons_hut78_output,cons_har18_output,cons_har19_output]]
-
         results_dict.update({
                 "framewise_0.01" : frame,
 
@@ -182,20 +193,43 @@ for i,example in enumerate(example_paths):
                 "rhythm_hist": rhythm_hist,
                 "rhythm_disp_std": rhythm_disp_std,
                 "rhythm_disp_drift": rhythm_disp_drift,
-
-                "cons_hut78_output": cons_hut78_output,
-                "cons_har18_output": cons_har18_output,
-                "cons_har19_output":  cons_har19_output,
-
-                "cons_hut78_diff" : cons_hut78_diff,
-                "cons_har18_diff" : cons_har18_diff,
-                "cons_har19_diff" : cons_har19_diff,
-
                 })
+
+
+        if precomputed_consonance_path is not None:
+            #Import consonance features
+            consonance_target = pickle.load(open(os.path.join(precomputed_consonance_path,example,'target.pkl'),'rb'))
+            consonance_output = pickle.load(open(os.path.join(precomputed_consonance_path,example,system+'.pkl'),'rb'))
+
+            cons_hut78_target = [consonance_target[0],consonance_target[3],consonance_target[6],consonance_target[9]]
+            cons_har18_target = [consonance_target[1],consonance_target[4],consonance_target[7],consonance_target[10]]
+            cons_har19_target = [consonance_target[2],consonance_target[5],consonance_target[8],consonance_target[11]]
+
+            cons_hut78_output = [consonance_output[0],consonance_output[3],consonance_output[6],consonance_output[9]]
+            cons_har18_output = [consonance_output[1],consonance_output[4],consonance_output[7],consonance_output[10]]
+            cons_har19_output = [consonance_output[2],consonance_output[5],consonance_output[8],consonance_output[11]]
+
+            cons_hut78_diff = [c1-c2 for (c1,c2) in zip(cons_hut78_output,cons_hut78_target)]
+            cons_har18_diff = [c1-c2 for (c1,c2) in zip(cons_har18_output,cons_har18_target)]
+            cons_har19_diff = [c1-c2 for (c1,c2) in zip(cons_har19_output,cons_har19_target)]
+
+        # all_cons += [[cons_hut78_output,cons_har18_output,cons_har19_output]]
+
+            results_dict.update({
+                    "cons_hut78_output": cons_hut78_output,
+                    "cons_har18_output": cons_har18_output,
+                    "cons_har19_output":  cons_har19_output,
+
+                    "cons_hut78_diff" : cons_hut78_diff,
+                    "cons_har18_diff" : cons_har18_diff,
+                    "cons_har19_diff" : cons_har19_diff,
+
+                    })
+
         all_dicts += [results_dict]
 
 
-        # ### Check that there are no NaNs:
+        # # ### Check that there are no NaNs:
         for key,value in results_dict.items():
             if np.any(np.isnan(np.array(value))):
                 raise Exception('NaN value in feature '+key+'!!!!')
@@ -234,4 +268,4 @@ for i,example in enumerate(example_paths):
 #         plt.hist(values,bins=n_bin)
 #         plt.title(key)
 #
-#     plt.savefig('plots_distrib/'+key+'.png')
+#     plt.savefig('plots/plots_distrib/'+key+'.png')

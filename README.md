@@ -47,7 +47,7 @@ Some useful processing functions can be found in ```features.utils```, such as
 
 
 To train a new metric, you first need to download the ratings and MIDI files from: **ADD LINK WHEN DATA IS UPLOADED**
-Then, run ```$ python export_features.py``` to precompute the features and save them, for each pair of (target, output).
+Then, run ```$ python export_features.py <MIDI_files_location> <answers_csv_path> <output_folder>``` to precompute the features and save them, for each pair of (target, output).
 
 Then use the script ```classifier.py```.
 Create a new ```@ex.named_config``` on the same model as ```export_metric```.
@@ -55,7 +55,7 @@ Edit the entries ```features_to_use``` and ```features_to_remove``` of the ```cf
 
 To run the script, run ```$ python classifier with <your_config_name>```.
 
-To use the obtained parameters to evaluate some outputs, use: ```eval = PEAMT(<your_parameters_filepath>)```.
+To use the obtained parameters to evaluate some outputs, use: ```eval = PEAMT(parameters=<your_parameters_filepath>)```.
 
 # Using individual features
 
