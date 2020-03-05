@@ -1,6 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import pretty_midi as pm
+import copy
+
+
+def make_roll(intervals,pitches,shape,fs=100):
+    assert len(intervals) == len(pitches)
+
+    roll = np.zeros(shape)
+    for pitch, (start,end) in zip(pitches,intervals):
+        # use int() instead of int(round()) to be coherent with PrettyMIDI.get_piano_roll()
+        start = int(start*fs)
+        end = int(end*fs)
+        if start == end:
+            end = start+1
+        roll[int(pitch),start:end]=1
+    return roll
 
 
 def get_roll_from_times(midi_data,times):
@@ -163,7 +179,7 @@ def get_time(data,bar,beat,sub_beat):
 
     return time
 
-    
+
 def str_to_bar_beat(string):
     if '.' in string:
         str_split = string.split('.')
@@ -177,3 +193,75 @@ def str_to_bar_beat(string):
     else:
         output = [int(string),0,0]
     return output
+
+def apply_sustain_control_changes(midi):
+    all_CCs = []
+    for instr in midi.instruments:
+        all_CCs += instr.control_changes
+    all_pedals = [cc for cc in all_CCs if cc.number==64]
+    pedals_sorted = sorted(all_pedals,key=lambda x: x.time)
+
+    #Add an extra pedal off at the end, just in case
+    pedals_sorted += [pm.ControlChange(64,0,midi.get_end_time())]
+
+    #Create a pedal_ON array such that pedal_ON[i]>0 iff pedal is on at tick i
+    #If pedal_ON[i]>0, its value is the time at which pedal becomes off again
+    pedal_ON = np.zeros(midi._PrettyMIDI__tick_to_time.shape,dtype=float)
+    # -1 if pedal is currently off, otherwise tick time of first time it is on.
+    ON_idx = -1
+    for cc in pedals_sorted:
+        if cc.value > 64:
+            if ON_idx < 0:
+                ON_idx = midi.time_to_tick(cc.time)
+            else:
+                # Pedal is already ON
+                pass
+        else:
+            if ON_idx>0:
+                pedal_ON[ON_idx:midi.time_to_tick(cc.time)]=cc.time
+                ON_idx = -1
+            else:
+                # Pedal is already OFF
+                pass
+
+    # Copy to keep time signatures and tempo changes, but remove notes and CCs
+    new_midi = copy.deepcopy(midi)
+    new_midi.instruments = []
+
+
+    # Store the notes per pitch, to trim them afterwards.
+    all_notes = np.empty([128],dtype=object)
+    for i in range(128):
+        all_notes[i] = []
+
+
+    for instr in midi.instruments:
+
+        # First, extend all the notes until the pedal is off
+        for note in instr.notes:
+            start_tick = midi.time_to_tick(note.start)
+            end_tick = midi.time_to_tick(note.end)
+
+            if np.any(pedal_ON[start_tick:end_tick]>0):
+                # Pedal is on while note is on
+                end_pedal = np.max(pedal_ON[start_tick:end_tick])
+                note.end = max(note.end,end_pedal)
+            else:
+                # Pedal is not on while note is on, no modifications needed
+                pass
+            all_notes[note.pitch] += [note]
+
+    new_instr = pm.Instrument(program=pm.instrument_name_to_program('Acoustic Grand Piano'),name="Piano")
+
+    # Then, trim notes so they don't overlap
+    for note_list in all_notes:
+        if note_list != []:
+            note_list = sorted(note_list,key=lambda x: x.start)
+            for note_1,note_2 in zip(note_list[:-1],note_list[1:]):
+                note_1.end = min(note_1.end,note_2.start)
+                new_instr.notes += [note_1]
+            new_instr.notes += [note_list[-1]]
+
+    new_midi.instruments.append(new_instr)
+
+    return new_midi

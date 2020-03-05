@@ -5,7 +5,6 @@ import pretty_midi as pm
 import mir_eval
 import pickle
 # import matplotlib.pyplot as plt
-from utils import apply_sustain_control_changes, make_roll
 from classifier_utils import import_features
 import features.utils as utils
 from features.benchmark import framewise, notewise
@@ -48,16 +47,22 @@ class PEAMT():
 
     def __init__(self,parameters='model_parameters/PEAMT.pkl'):
 
-        parameters = pickle.load(open(parameters), "rb")
+        parameters = pickle.load(open(parameters, "rb"))
 
         self.weight = parameters['best_weights']
-        self.bias = parameters['beat_bias']
+        self.bias = parameters['best_bias']
+        self.data_mean = parameters['data_mean']
+        self.data_std = parameters['data_std']
+
+    def normalise(self,features):
+        return (features-self.data_mean)/self.data_std
 
     def compute_from_features(self,features):
         def sigmoid(x):
             return 1 / (1 + math.exp(-x))
 
-        value = np.multiply(features,self.weight) + self.bias
+        features = self.normalise(features)
+        value = np.matmul(features,self.weight) + self.bias
         return sigmoid(value)
 
     def evaluate_from_midi(self,ref_midi, est_midi):
@@ -76,41 +81,44 @@ class PEAMT():
             raise ValueError("Type of 'est_midi' arg not understood! Should be str or PrettyMIDI object.")
 
         notes_target_no_pedal, intervals_target_no_pedal, vel_target_no_pedal = utils.get_notes_intervals(ref_midi,with_vel=True)
-        midi_sustain = apply_sustain_control_changes(ref_midi)
+        midi_sustain = utils.apply_sustain_control_changes(ref_midi)
         notes_target, intervals_target, vel_target = utils.get_notes_intervals(midi_sustain,with_vel=True)
         notes_output, intervals_output = utils.get_notes_intervals(est_midi)
 
-        return evaluate(notes_output, intervals_output, ,notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal)
+        return self.evaluate(notes_output, intervals_output, notes_target, intervals_target,intervals_target_no_pedal, vel_target)
 
 
-    def evaluate(self,notes_output, intervals_output, ,notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal):
+    def evaluate(self,notes_output, intervals_output, notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal, vel_target_no_pedal):
 
         ### Validate values
-        mir_eval.transcription.validate_intervals(ref_intervals,est_intervals)
-        mir_eval.transcription.validate_intervals(ref_intervals_sustain,est_intervals)
-        if np.any(est_pitches!=est_pitches.astype(int)):
-            raise ValueError('est_midi pitches should all be integers!')
-        if np.any(ref_pitches!=ref_pitches.astype(int)):
-            raise ValueError('ref_midi pitches should all be integers!')
+        mir_eval.transcription.validate_intervals(intervals_target,intervals_output)
+        mir_eval.transcription.validate_intervals(intervals_target_no_pedal,intervals_output)
+        if np.any(notes_output!=notes_output.astype(int)):
+            raise ValueError('notes_output should all be integers!')
+        if np.any(notes_target!=notes_target.astype(int)):
+            raise ValueError('notes_target should all be integers!')
+        if np.any(notes_target_no_pedal!=notes_target_no_pedal.astype(int)):
+            raise ValueError('notes_target_no_pedal should all be integers!')
 
 
         ### Create piano rolls
         fs=100
 
-        max_len = max(np.max(ref_instervals),np.max(ref_instervals_sustain),np.max(est_intervals))
-        max_pitch = int(max(np.max(ref_pitches),np.max(ref_pitches_sustain),np.max(est_pitches)))+1
+        max_len = int(max(np.max(intervals_target),np.max(intervals_target_no_pedal),np.max(intervals_output)))+1
+        max_pitch = int(max(np.max(notes_output),np.max(notes_target),np.max(notes_target_no_pedal)))+1
         roll_shape = [max_pitch+1,max_len+1]
 
 
-        output = make_roll(est_intervals,est_pitches,roll_shape)
-        target_no_pedal = make_roll(ref_intervals,ref_pitches,roll_shape)
-        target = make_roll(ref_intervals_sustain,ref_pitches,roll_shape)
+        output = utils.make_roll(intervals_output,notes_output,roll_shape)
+        target_no_pedal = utils.make_roll(intervals_target_no_pedal,notes_target_no_pedal,roll_shape)
+        target = utils.make_roll(intervals_target,notes_target,roll_shape)
 
 
         ### Compute features
         frame = framewise(output,target)
 
         match_on = mir_eval.transcription.match_notes(intervals_target, notes_target, intervals_output, notes_output, onset_tolerance=0.05, offset_ratio=None, pitch_tolerance=0.25)
+        match_on_no_pedal = mir_eval.transcription.match_notes(intervals_target_no_pedal, notes_target_no_pedal, intervals_output, notes_output, onset_tolerance=0.05, offset_ratio=None, pitch_tolerance=0.25)
 
         # Use onset-only matchings by default
         match = match_on
@@ -123,8 +131,8 @@ class PEAMT():
         high_f = framewise_highest(output, target_no_pedal)
         low_f = framewise_lowest(output, target_no_pedal)
 
-        high_n = notewise_highest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match)
-        low_n = notewise_lowest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match)
+        high_n = notewise_highest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match_on_no_pedal)
+        low_n = notewise_lowest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match_on_no_pedal)
 
         loud_fn = false_negative_loudness(match, vel_target, intervals_target)
         loud_ratio_fn = loudness_ratio_false_negative(notes_target, intervals_target, vel_target, match)
@@ -149,7 +157,7 @@ class PEAMT():
         rhythm_hist = rhythm_histogram(intervals_output,intervals_target)
         rhythm_disp_std,rhythm_disp_drift = rhythm_dispersion(intervals_output, intervals_target)
 
-        results_dict.update({
+        results_dict = {
                 "framewise_0.01" : frame,
 
                 "notewise_On_50" : note_on,
@@ -175,7 +183,7 @@ class PEAMT():
                 "rhythm_disp_std": rhythm_disp_std,
                 "rhythm_disp_drift": rhythm_disp_drift,
 
-                })
+                }
 
         feature_list = import_features(results_dict, ALL_FEATURES)
 
