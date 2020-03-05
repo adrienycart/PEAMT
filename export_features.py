@@ -23,16 +23,18 @@ except:
     # python 3
     import pickle
 
-MIDI_path = 'app/static/data/all_midi_cut'
+MIDI_path = 'data/all_midi_cut'
 systems = ['kelz', 'lisu', 'google', 'cheng']
 
 fs=100
 
 precomputed_consonance_path = 'features/consonance_statistics_no_empty_chords'
 
-write_path = 'precomputed_features_cons_nozero'
+write_path = 'data/precomputed_features_cons_nozero_correcthighlow'
 
 all_dicts = []
+
+incorrect = 0
 
 example_paths = [path for path in os.listdir(MIDI_path) if not path.startswith('.')]
 for i,example in enumerate(example_paths):
@@ -84,6 +86,8 @@ for i,example in enumerate(example_paths):
             note = notewise(match_on,notes_output,notes_target)
             results_dict.update({'notewise_On_'+str(on_tol): note})
 
+        match_no_pedal = mir_eval.transcription.match_notes(intervals_target_no_pedal, notes_target_no_pedal, intervals_output, notes_output, onset_tolerance=0.05, offset_ratio=None, pitch_tolerance=0.25)
+
         for on_tol in [25,50,75,100,125,150]:
             for off_tol in [0.1,0.2,0.3,0.4,0.5]:
                 match_onoff = mir_eval.transcription.match_notes(intervals_target, notes_target, intervals_output, notes_output,onset_tolerance=on_tol/1000.0, offset_ratio=off_tol, pitch_tolerance=0.25)
@@ -91,11 +95,20 @@ for i,example in enumerate(example_paths):
                 results_dict.update({'notewise_OnOff_'+str(on_tol)+'_'+str(object=off_tol): note})
 
 
+
+        # print '##########'
+        # for i,j in match:
+        #     print notes_output[j], notes_target[i]
+        # print '----'
+        # for i,j in match:
+        #     print notes_output[j], notes_target_no_pedal[i]
+
+
         high_f = framewise_highest(output, target_no_pedal)
         low_f = framewise_lowest(output, target_no_pedal)
 
-        high_n = notewise_highest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match)
-        low_n = notewise_lowest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match)
+        high_n = notewise_highest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match_no_pedal)
+        low_n = notewise_lowest(notes_output, intervals_output, notes_target_no_pedal, intervals_target_no_pedal, match_no_pedal)
 
         loud_fn = false_negative_loudness(match, vel_target, intervals_target)
         loud_ratio_fn = loudness_ratio_false_negative(notes_target, intervals_target, vel_target, match)
@@ -183,12 +196,12 @@ for i,example in enumerate(example_paths):
 
 
         # ### Check that there are no NaNs:
-        # for key,value in results_dict.items():
-        #     if np.any(np.isnan(np.array(value))):
-        #         raise Exception('NaN value in feature '+key+'!!!!')
-        #
-        #
-        # pickle.dump(results_dict, open(os.path.join(dir,system+'.pkl'), 'wb'),protocol=2)
+        for key,value in results_dict.items():
+            if np.any(np.isnan(np.array(value))):
+                raise Exception('NaN value in feature '+key+'!!!!')
+
+
+        pickle.dump(results_dict, open(os.path.join(dir,system+'.pkl'), 'wb'),protocol=2)
 
 # all_cons = np.array(all_cons)
 # n_bin=100
@@ -205,20 +218,20 @@ for i,example in enumerate(example_paths):
 #     plt.hist(cons[:,3],bins=n_bin) #min
 #     plt.show()
 
-n_bin=100
-for key in all_dicts[0].keys():
-    values = []
-    for res_dict in all_dicts:
-         values += [res_dict[key]]
-    values = np.array(values)
-    if len(values.shape) > 1:
-        n_vals = values.shape[1]
-        fig, axes=plt.subplots(n_vals,1)
-        for i in range(n_vals):
-            axes[i].hist(values[:,i],bins=n_bin)
-        plt.suptitle(key)
-    else:
-        plt.hist(values,bins=n_bin)
-        plt.title(key)
-
-    plt.savefig('plots_distrib/'+key+'.png')
+# n_bin=100
+# for key in all_dicts[0].keys():
+#     values = []
+#     for res_dict in all_dicts:
+#          values += [res_dict[key]]
+#     values = np.array(values)
+#     if len(values.shape) > 1:
+#         n_vals = values.shape[1]
+#         fig, axes=plt.subplots(n_vals,1)
+#         for i in range(n_vals):
+#             axes[i].hist(values[:,i],bins=n_bin)
+#         plt.suptitle(key)
+#     else:
+#         plt.hist(values,bins=n_bin)
+#         plt.title(key)
+#
+#     plt.savefig('plots_distrib/'+key+'.png')
