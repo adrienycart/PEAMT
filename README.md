@@ -45,11 +45,37 @@ Some useful processing functions can be found in ```features.utils```, such as
 
 # Training a new metric
 
-To train a new metric, use the script ```classifier.py```.
 
+To train a new metric, you first need to download the ratings and MIDI files from: **ADD LINK WHEN DATA IS UPLOADED**
+Then, run ```$ python export_features.py``` to precompute the features and save them, for each pair of (target, output).
+
+Then use the script ```classifier.py```.
 Create a new ```@ex.named_config``` on the same model as ```export_metric```.
 Edit the entries ```features_to_use``` and ```features_to_remove``` of the ```cfg``` dictionary to specify the features to include or leave out (respectively).
 
 To run the script, run ```$ python classifier with <your_config_name>```.
 
 To use the obtained parameters to evaluate some outputs, use: ```eval = PEAMT(<your_parameters_filepath>)```.
+
+# Using individual features
+
+The individual features can also be used: **TODO: Make sure this is actually working**
+
+```
+import pretty_midi as pm
+
+from peamt.features.rhythm import rhythm_histogram
+import peamt.features.utils as utils
+
+
+output_filename = 'output.mid'
+target_filename = 'target.mid'
+
+output_data = pm.PrettyMIDI(output_filename)
+target_data = pm.PrettyMIDI(output_filename)
+
+notes_output, intervals_output = utils.get_notes_intervals(output_data)
+notes_target, intervals_target = utils.get_notes_intervals(target_data)
+
+rhythm_hist_out, rhythm_hist_diff = rhythm_histogram(intervals_output,intervals_target)
+```
