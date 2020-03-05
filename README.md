@@ -34,9 +34,13 @@ eval = PEAMT()
 value = eval.evaluate_from_midi(target_filename,output_filename)
 ```
 
-```evaluate_from_midi``` can take as input a string or a PrettyMIDI object.
+```eval.evaluate_from_midi``` can take as input a string or a PrettyMIDI object.
 
 Make sure the target filename contains correct velocities and sustain pedal activations (control change &#35;64).
+
+To run directly from lists of notes, use ```eval.evaluate```.
+Some useful processing functions can be found in ```features.utils```, such as
+```apply_sustain_control_changes``` and ```get_notes_intervals```.
 
 
 # Training a new metric
