@@ -72,7 +72,7 @@ def cfg():
            "batch_size": 100,
            "train_iters": 3000,
 
-           "feature_dir": 'precomputed_features_cons_nozero',
+           "feature_dir": 'data/precomputed_features_cons_nozero',
                                #  1   2   3   4   5
            'difficulty_margins':[0.5,0.4,0.3,0.2,0.1],
 
@@ -100,6 +100,7 @@ def export_metric():
                       ],
             'n_folds':None, #None uses all available data for training, validation, and testing
             'n_repeats':1,
+            'base_folder': '.',
             'config_folder':'model_parameters',
             'pkl_name':'PEAMT.pkl',
             }

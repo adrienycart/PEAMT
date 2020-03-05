@@ -46,12 +46,12 @@ ALL_FEATURES = [
 
 class PEAMT():
 
-    def __init__(self,parameters='default_metric_params.pkl'):
+    def __init__(self,parameters='model_parameters/PEAMT.pkl'):
 
         parameters = pickle.load(open(parameters), "rb")
 
-        self.weight = parameters['weights']
-        self.bias = parameters['bias']
+        self.weight = parameters['best_weights']
+        self.bias = parameters['beat_bias']
 
     def compute_from_features(self,features):
         def sigmoid(x):
@@ -60,9 +60,7 @@ class PEAMT():
         value = np.multiply(features,self.weight) + self.bias
         return sigmoid(value)
 
-
-    def evaluate(self,ref_midi, est_midi):
-
+    def evaluate_from_midi(self,ref_midi, est_midi):
         if type(ref_midi) is pm.PrettyMIDI:
             pass
         elif type(ref_midi) is str:
@@ -77,12 +75,15 @@ class PEAMT():
         else:
             raise ValueError("Type of 'est_midi' arg not understood! Should be str or PrettyMIDI object.")
 
-
-
-        notes_target_no_pedal, intervals_target_no_pedal = utils.get_notes_intervals(ref_midi,with_vel=True)
+        notes_target_no_pedal, intervals_target_no_pedal, vel_target_no_pedal = utils.get_notes_intervals(ref_midi,with_vel=True)
         midi_sustain = apply_sustain_control_changes(ref_midi)
-        notes_target, intervals_target = utils.get_notes_intervals(midi_sustain,with_vel=True)
+        notes_target, intervals_target, vel_target = utils.get_notes_intervals(midi_sustain,with_vel=True)
         notes_output, intervals_output = utils.get_notes_intervals(est_midi)
+
+        return evaluate(notes_output, intervals_output, ,notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal)
+
+
+    def evaluate(self,notes_output, intervals_output, ,notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal):
 
         ### Validate values
         mir_eval.transcription.validate_intervals(ref_intervals,est_intervals)
