@@ -64,7 +64,10 @@ ALL_FEATURES = [
 @ex.config
 def cfg():
     cfg = {"base_folder" : "results_metric", # Base folder for model checkpoints
-           "n_folds" : 20, #which of the 4 folds used to run the experiments
+           'user_csv_path': 'data/db_csv/user_data.csv',
+           'answers_csv_path': 'data/db_csv/answers_data.csv',
+
+           "n_folds" : 20,
            'n_repeats': 100,
            "batch_size": 100,
            "train_iters": 3000,
@@ -78,8 +81,28 @@ def cfg():
            "config_folder": "all_features",
            'features_to_use': ALL_FEATURES,
            'features_to_remove':[],
+
+           'pkl_name':'all_folds.pkl',
+
             }
 
+
+@ex.named_config
+def export_metric():
+    cfg = {'features_to_remove': [
+                     "semitone_f",
+                     "octave_f",
+                     "third_harmonic_f",
+                     "semitone_n",
+                     "octave_n",
+                     "third_harmonic_n",
+                     "valid_cons",
+                      ],
+            'n_folds':None, #None uses all available data for training, validation, and testing
+            'n_repeats':1,
+            'config_folder':'model_parameters',
+            'pkl_name':'PEAMT.pkl',
+            }
 
 @ex.named_config
 def all_features_maxdiffic4():
@@ -263,11 +286,11 @@ def train_classif(cfg):
     #### Prepare data:
     feature_dir = cfg['feature_dir']
 
-    filecp = codecs.open('db_csv/answers_data.csv', encoding = 'utf-8')
+    filecp = codecs.open(cfg['answers_csv_path'], encoding = 'utf-8')
     answers = np.genfromtxt(filecp,dtype=object,delimiter=";")
     answers = answers[1:,:]
 
-    filecp = codecs.open('db_csv/user_data.csv', encoding = 'utf-8')
+    filecp = codecs.open(cfg['user_csv_path'], encoding = 'utf-8')
     users = np.genfromtxt(filecp,dtype=object,delimiter=";")
     users = users[1:,:]
 
@@ -389,55 +412,66 @@ def train_classif(cfg):
 
     all_results = {}
 
-    for fold in range(cfg['n_folds']):
+    if cfg['n_folds'] is None:
+        folds = 1
+    else:
+        folds = cfg['n_folds']
+
+    for fold in range(folds):
 
 
-        ###### USE EACH INDIVIDUAL ANSWER
-        all_examples, indices = np.unique(answers[:,1],return_index=True)
-        sort_idx = np.argsort(indices)
-        all_examples = all_examples[sort_idx]
-        example_indices = indices[sort_idx]
+        if cfg['n_folds'] is None:
+            #None uses all available data for training, validation, and testing
+            idx_test = np.ones([len(answers)],dtype=bool)
+            idx_valid = np.ones([len(answers)],dtype=bool)
+            idx_train = np.ones([len(answers)],dtype=bool)
 
-
-        n_examples = len(all_examples)
-        n_test = int(1.0/cfg['n_folds']*n_examples)
-        n_valid = int(1.0/cfg['n_folds']*n_examples)
-        # n_test = 0
-        # n_valid = int(0.1*n_examples)
-        ex_idx_test_start = fold*n_test
-        ex_idx_test_end= (fold+1)*n_test
-        if fold == cfg['n_folds']-1:
-            ex_idx_valid_start = 0*n_valid
-            ex_idx_valid_end = 1*n_valid
         else:
-            ex_idx_valid_start = ex_idx_test_end
-            ex_idx_valid_end = ex_idx_test_end+n_valid
+            # Split data according to folds
 
-        # print ex_idx_valid_end-ex_idx_valid_start,n_valid, ex_idx_test_end-ex_idx_test_start, n_test
+            ###### USE EACH INDIVIDUAL ANSWER
+            all_examples, indices = np.unique(answers[:,1],return_index=True)
+            sort_idx = np.argsort(indices)
+            all_examples = all_examples[sort_idx]
+            example_indices = indices[sort_idx]
 
-        idx_test_start = example_indices[ex_idx_test_start]
-        idx_test_end = example_indices[ex_idx_test_end]
-        idx_valid_start = example_indices[ex_idx_valid_start]
-        idx_valid_end = example_indices[ex_idx_valid_end]
 
-        idx_test = np.zeros([len(answers)],dtype=bool)
-        idx_valid = np.zeros([len(answers)],dtype=bool)
-        idx_train = np.zeros([len(answers)],dtype=bool)
+            n_examples = len(all_examples)
+            n_test = int(1.0/cfg['n_folds']*n_examples)
+            n_valid = int(1.0/cfg['n_folds']*n_examples)
+            # n_test = 0
+            # n_valid = int(0.1*n_examples)
+            ex_idx_test_start = fold*n_test
+            ex_idx_test_end= (fold+1)*n_test
+            if fold == cfg['n_folds']-1:
+                ex_idx_valid_start = 0*n_valid
+                ex_idx_valid_end = 1*n_valid
+            else:
+                ex_idx_valid_start = ex_idx_test_end
+                ex_idx_valid_end = ex_idx_test_end+n_valid
 
-        if fold == cfg['n_folds']-1:
-            idx_test[idx_test_start:] = True
-            idx_valid[idx_valid_start:idx_valid_end] = True
-            idx_train[idx_valid_end:idx_test_start] = True
-        else:
-            idx_test[idx_test_start:idx_test_end] = True
-            idx_valid[idx_valid_start:idx_valid_end] = True
-            idx_train[:idx_test_start] = True
-            idx_train[idx_valid_end:] = True
+            # print ex_idx_valid_end-ex_idx_valid_start,n_valid, ex_idx_test_end-ex_idx_test_start, n_test
 
-        # print [idx_test_start,idx_test_end], [idx_valid_start,idx_valid_end]
-        # print fold, np.sum(idx_test),np.sum(idx_valid),np.sum(idx_train)
-        # print np.all(idx_test.astype(int)+idx_valid.astype(int)+idx_train.astype(int)==1),np.any(idx_test.astype(int)+idx_valid.astype(int)+idx_train.astype(int)==0), np.any(idx_test.astype(int)+idx_valid.astype(int)+idx_train.astype(int)==2)
-        # continue
+            idx_test_start = example_indices[ex_idx_test_start]
+            idx_test_end = example_indices[ex_idx_test_end]
+            idx_valid_start = example_indices[ex_idx_valid_start]
+            idx_valid_end = example_indices[ex_idx_valid_end]
+
+            idx_test = np.zeros([len(answers)],dtype=bool)
+            idx_valid = np.zeros([len(answers)],dtype=bool)
+            idx_train = np.zeros([len(answers)],dtype=bool)
+
+            if fold == cfg['n_folds']-1:
+                idx_test[idx_test_start:] = True
+                idx_valid[idx_valid_start:idx_valid_end] = True
+                idx_train[idx_valid_end:idx_test_start] = True
+            else:
+                idx_test[idx_test_start:idx_test_end] = True
+                idx_valid[idx_valid_start:idx_valid_end] = True
+                idx_train[:idx_test_start] = True
+                idx_train[idx_valid_end:] = True
+
+
 
         features1_train = features1[idx_train]
         features2_train = features2[idx_train]
@@ -706,25 +740,38 @@ def train_classif(cfg):
             # print repeat_agreement
 
 
-
-        results_dict = {'repeat_agreement':repeat_agreement,
-                        'repeat_agreement_agg':repeat_agreement_agg,
-                        'repeat_agreement_conf':repeat_agreement_conf,
-                        'agreement_F1': agreement_F1,
-                        'agreement_F1_agg': agreement_F1_agg,
-                        'agreement_F1_conf': agreement_F1_conf,
-                        'repeat_best_weights':repeat_best_weights,
-                        'repeat_best_bias':repeat_best_bias}
+        if N_REPEATS > 1:
+            results_dict = {'repeat_agreement':repeat_agreement,
+                            'repeat_agreement_agg':repeat_agreement_agg,
+                            'repeat_agreement_conf':repeat_agreement_conf,
+                            'agreement_F1': agreement_F1,
+                            'agreement_F1_agg': agreement_F1_agg,
+                            'agreement_F1_conf': agreement_F1_conf,
+                            'repeat_best_weights':repeat_best_weights,
+                            'repeat_best_bias':repeat_best_bias}
+        else:
+            results_dict = {'agreement':repeat_agreement[0],
+                            'agreement_agg':repeat_agreement_agg[0],
+                            'agreement_conf':repeat_agreement_conf[0],
+                            'agreement_F1': agreement_F1,
+                            'agreement_F1_agg': agreement_F1_agg,
+                            'agreement_F1_conf': agreement_F1_conf,
+                            'best_weights':repeat_best_weights[0],
+                            'best_bias':repeat_best_bias[0]}
 
         # print np.std(repeat_agreement)
         # print np.mean(repeat_agreement)
-        save_path = os.path.join(save_destination,'fold'+str(fold)+'.pkl')
+        if cfg['n_folds'] is not None:
+            save_path = os.path.join(save_destination,'fold'+str(fold)+'.pkl')
+            pickle.dump(results_dict, open(save_path, 'wb'))
+
+            all_results['fold'+str(fold)]=results_dict
+
+    save_path = os.path.join(save_destination,cfg['pkl_name'])
+    if cfg['n_folds'] is not None:
+        pickle.dump(all_results, open(save_path, 'wb'))
+    else:
         pickle.dump(results_dict, open(save_path, 'wb'))
-
-        all_results['fold'+str(fold)]=results_dict
-
-    save_path = os.path.join(save_destination,'all_folds.pkl')
-    pickle.dump(all_results, open(save_path, 'wb'))
 
 
     #
