@@ -546,14 +546,14 @@ def train_classif(cfg):
         ###############################
         #### Normalise features
         all_features_train = np.concatenate([features1_train,features2_train],axis=0)
-        mean = np.mean(all_features_train,axis=0)
-        std = np.std(all_features_train,axis=0)
-        features1_train = (features1_train-mean)/std
-        features2_train = (features2_train-mean)/std
-        features1_valid = (features1_valid-mean)/std
-        features2_valid = (features2_valid-mean)/std
-        features1_test = (features1_test-mean)/std
-        features2_test = (features2_test-mean)/std
+        data_mean = np.mean(all_features_train,axis=0)
+        data_std = np.std(all_features_train,axis=0)
+        features1_train = (features1_train-data_mean)/data_std
+        features2_train = (features2_train-data_mean)/data_std
+        features1_valid = (features1_valid-data_mean)/data_std
+        features2_valid = (features2_valid-data_mean)/data_std
+        features1_test = (features1_test-data_mean)/data_std
+        features2_test = (features2_test-data_mean)/data_std
 
 
         #### AGGREGATE CONFIDENT TEST ANSWERS
@@ -685,7 +685,7 @@ def train_classif(cfg):
             #
             # print 'Best parameters:'
             # for (label,value) in zip(labels,best_parameters):
-            #     print label, value
+                # print label, value
             # plt.plot(valid_costs)
             # plt.plot(train_costs)
             # plt.show()
@@ -749,7 +749,9 @@ def train_classif(cfg):
                             'agreement_F1_agg': agreement_F1_agg,
                             'agreement_F1_conf': agreement_F1_conf,
                             'repeat_best_weights':repeat_best_weights,
-                            'repeat_best_bias':repeat_best_bias}
+                            'repeat_best_bias':repeat_best_bias,
+                            'data_mean':data_mean,
+                            'data_std':data_std,}
         else:
             results_dict = {'agreement':repeat_agreement[0],
                             'agreement_agg':repeat_agreement_agg[0],
@@ -758,7 +760,9 @@ def train_classif(cfg):
                             'agreement_F1_agg': agreement_F1_agg,
                             'agreement_F1_conf': agreement_F1_conf,
                             'best_weights':repeat_best_weights[0],
-                            'best_bias':repeat_best_bias[0]}
+                            'best_bias':repeat_best_bias[0],
+                            'data_mean':data_mean,
+                            'data_std':data_std,}
 
         # print np.std(repeat_agreement)
         # print np.mean(repeat_agreement)
@@ -775,7 +779,7 @@ def train_classif(cfg):
         pickle.dump(results_dict, open(save_path, 'wb'))
 
 
-    #
+
     # plt.scatter(notewise1_test,metrics1,color='tab:blue')
     # plt.scatter(notewise2_test,metrics2,color='tab:blue')
     # plt.ylim([0,1])
