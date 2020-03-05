@@ -64,8 +64,8 @@ The individual features can also be used: **TODO: Make sure this is actually wor
 ```
 import pretty_midi as pm
 
-from peamt.features.rhythm import rhythm_histogram
-import peamt.features.utils as utils
+from features.rhythm import rhythm_histogram
+import features.utils as utils
 
 
 output_filename = 'output.mid'
