@@ -18,7 +18,7 @@ def calculate_stds(data, means):
 
 
 # TESTED
-def rhythm_histogram(intervals_output, intervals_target, beats=None, noise=0.0):
+def rhythm_histogram(intervals_output, intervals_target):
     # return the logged spectral flatness ratio of the IOIs, where spectral flatness ratio is defined as the ratio of the geometric mean of the histogram over its arithmetic mean.
     # 1. spectral flatness for IOI of the output transcription
     # 2. spectral flatness for IOI of the ground truth music piece
@@ -28,12 +28,6 @@ def rhythm_histogram(intervals_output, intervals_target, beats=None, noise=0.0):
     onsets_target = [interval[0] for interval in intervals_target]
     onsets_output.sort()
     onsets_target.sort()
-
-    # test quantized notes
-    if beats is not None:
-        onsets_output = [beats[np.argmin(np.abs(beats - onset))] for onset in onsets_output]
-    if noise != 0.0:
-        onsets_output = [onset + random.random()*noise*2 - noise for onset in onsets_output]
 
     ioi_output = [onsets_output[idx+1] - onsets_output[idx] for idx in range(len(onsets_output)-1)]
     ioi_target = [onsets_target[idx+1] - onsets_target[idx] for idx in range(len(onsets_target)-1)]
@@ -72,7 +66,7 @@ def rhythm_histogram(intervals_output, intervals_target, beats=None, noise=0.0):
 
 
 # TESTED
-def rhythm_dispersion(intervals_output, intervals_target, beats=None, noise=0.0):
+def rhythm_dispersion(intervals_output, intervals_target):
     # return changes in k-means clusters
     # 1. change in standard deviations
     # 2. center drift
@@ -83,11 +77,6 @@ def rhythm_dispersion(intervals_output, intervals_target, beats=None, noise=0.0)
     onsets_output.sort()
     onsets_target.sort()
 
-    # test quantized notes
-    if beats is not None:
-        onsets_output = [beats[np.argmin(np.abs(beats - onset))] for onset in onsets_output]
-    if noise != 0.0:
-        onsets_output = [onset + random.random()*noise*2 - noise for onset in onsets_output]
 
     ioi_output = [onsets_output[idx+1] - onsets_output[idx] for idx in range(len(onsets_output)-1)]
     ioi_target = [onsets_target[idx+1] - onsets_target[idx] for idx in range(len(onsets_target)-1)]

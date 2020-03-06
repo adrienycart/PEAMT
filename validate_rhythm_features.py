@@ -37,6 +37,14 @@ def generate_hist_plots(x1, x2, x3, limits, title, filename, n_bins=100):
     plt.savefig(filename)
     plt.show()
 
+def add_noise(intervals,noise_level):
+    return intervals + np.random.uniform(-noise_level,noise_level,size = [intervals.shape[0],1])
+
+def quantise(intervals,beats):
+    onsets = intervals[:,0]
+    onsets = [beats[np.argmin(np.abs(beats - onset))] for onset in onsets]
+    intervals[:,0] = onsets
+    return intervals
 
 def plot_differences(d1, d2, limits, title, filename, n_bins=100):
 
@@ -96,13 +104,13 @@ else:
             else:
                 match_on = mir_eval.transcription.match_notes(intervals_target, notes_target, intervals_system, notes_system, offset_ratio=None, pitch_tolerance=0.25)
 
-            values[sfo, quantize, idx], values[sfd, quantize, idx] = rhythm_histogram(intervals_system, intervals_target, beats=quarter_times)
+            values[sfo, quantize, idx], values[sfd, quantize, idx] = rhythm_histogram(quantise(intervals_system,quarter_times), intervals_target)
             values[sfo, original, idx], values[sfd, original, idx] = rhythm_histogram(intervals_system, intervals_target)
-            values[sfo, noisy, idx], values[sfd, noisy, idx] = rhythm_histogram(intervals_system, intervals_target, noise=0.2)
+            values[sfo, noisy, idx], values[sfd, noisy, idx] = rhythm_histogram(add_noise(intervals_system,0.2), intervals_target)
 
-            [values[stdmean, quantize, idx], values[stdmin, quantize, idx], values[stdmax, quantize, idx]], [values[drmean, quantize, idx], values[drmin, quantize, idx], values[drmax, quantize, idx]] = rhythm_dispersion(intervals_system, intervals_target, beats=quarter_times)
+            [values[stdmean, quantize, idx], values[stdmin, quantize, idx], values[stdmax, quantize, idx]], [values[drmean, quantize, idx], values[drmin, quantize, idx], values[drmax, quantize, idx]] = rhythm_dispersion(quantise(intervals_system,quarter_times), intervals_target)
             [values[stdmean, original, idx], values[stdmin, original, idx], values[stdmax, original, idx]], [values[drmean, original, idx], values[drmin, original, idx], values[drmax, original, idx]] = rhythm_dispersion(intervals_system, intervals_target)
-            [values[stdmean, noisy, idx], values[stdmin, noisy, idx], values[stdmax, noisy, idx]], [values[drmean, noisy, idx], values[drmin, noisy, idx], values[drmax, noisy, idx]] = rhythm_dispersion(intervals_system, intervals_target, noise=0.2)
+            [values[stdmean, noisy, idx], values[stdmin, noisy, idx], values[stdmax, noisy, idx]], [values[drmean, noisy, idx], values[drmin, noisy, idx], values[drmax, noisy, idx]] = rhythm_dispersion(add_noise(intervals_system,0.2), intervals_target)
 
 
             idx += 1

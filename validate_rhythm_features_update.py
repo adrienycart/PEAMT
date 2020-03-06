@@ -54,6 +54,8 @@ def plot_hist(x1, x2, x3, x4, x5, title, limits, filename, n_bins=50):
     plt.savefig(filename)
     # plt.show()
 
+def add_noise(intervals,noise_level):
+    return intervals + np.random.uniform(-noise_level,noise_level,size = [intervals.shape[0],1])
 
 def print_line(values, feature_name, feature_index):
     print(feature_name+"\t| {:.3f} \t {:.3f} \t| {:.3f} \t {:.3f} \t| {:.3f} \t {:.3f} \t| {:.3f} \t {:.3f} \t| {:.3f} \t {:.3f}".format(np.mean(values[feature_index, strict_quantize]), np.std(values[feature_index, strict_quantize]), np.mean(values[feature_index, quantize]), np.std(values[feature_index, quantize]), np.mean(values[feature_index, noisy1]), np.std(values[feature_index, noisy1]), np.mean(values[feature_index, noisy2]), np.std(values[feature_index, noisy2]), np.mean(values[feature_index, noisy3]), np.std(values[feature_index, noisy3])))
@@ -115,15 +117,15 @@ else:
 
             values[sfo, strict_quantize, idx], values[sfd, strict_quantize, idx] = rhythm_histogram(intervals_system_strict_quantized, intervals_system)
             values[sfo, quantize, idx], values[sfd, quantize, idx] = rhythm_histogram(intervals_system_quantized, intervals_system)
-            values[sfo, noisy1, idx], values[sfd, noisy1, idx] = rhythm_histogram(intervals_system, intervals_system, noise=noise_level[0])
-            values[sfo, noisy2, idx], values[sfd, noisy2, idx] = rhythm_histogram(intervals_system, intervals_system, noise=noise_level[1])
-            values[sfo, noisy3, idx], values[sfd, noisy3, idx] = rhythm_histogram(intervals_system, intervals_system, noise=noise_level[2])
+            values[sfo, noisy1, idx], values[sfd, noisy1, idx] = rhythm_histogram(add_noise(intervals_system,noise_level[0]), intervals_system)
+            values[sfo, noisy2, idx], values[sfd, noisy2, idx] = rhythm_histogram(add_noise(intervals_system,noise_level[1]), intervals_system)
+            values[sfo, noisy3, idx], values[sfd, noisy3, idx] = rhythm_histogram(add_noise(intervals_system,noise_level[2]), intervals_system)
 
             [values[stdmean, strict_quantize, idx], values[stdmin, strict_quantize, idx], values[stdmax, strict_quantize, idx]], [values[drmean, strict_quantize, idx], values[drmin, strict_quantize, idx], values[drmax, strict_quantize, idx]] = rhythm_dispersion(intervals_system_strict_quantized, intervals_system)
             [values[stdmean, quantize, idx], values[stdmin, quantize, idx], values[stdmax, quantize, idx]], [values[drmean, quantize, idx], values[drmin, quantize, idx], values[drmax, quantize, idx]] = rhythm_dispersion(intervals_system_quantized, intervals_system)
-            [values[stdmean, noisy1, idx], values[stdmin, noisy1, idx], values[stdmax, noisy1, idx]], [values[drmean, noisy1, idx], values[drmin, noisy1, idx], values[drmax, noisy1, idx]] = rhythm_dispersion(intervals_system, intervals_system, noise=noise_level[0])
-            [values[stdmean, noisy2, idx], values[stdmin, noisy2, idx], values[stdmax, noisy2, idx]], [values[drmean, noisy2, idx], values[drmin, noisy2, idx], values[drmax, noisy2, idx]] = rhythm_dispersion(intervals_system, intervals_system, noise=noise_level[1])
-            [values[stdmean, noisy3, idx], values[stdmin, noisy3, idx], values[stdmax, noisy3, idx]], [values[drmean, noisy3, idx], values[drmin, noisy3, idx], values[drmax, noisy3, idx]] = rhythm_dispersion(intervals_system, intervals_system, noise=noise_level[2])
+            [values[stdmean, noisy1, idx], values[stdmin, noisy1, idx], values[stdmax, noisy1, idx]], [values[drmean, noisy1, idx], values[drmin, noisy1, idx], values[drmax, noisy1, idx]] = rhythm_dispersion(add_noise(intervals_system,noise_level[0]), intervals_system)
+            [values[stdmean, noisy2, idx], values[stdmin, noisy2, idx], values[stdmax, noisy2, idx]], [values[drmean, noisy2, idx], values[drmin, noisy2, idx], values[drmax, noisy2, idx]] = rhythm_dispersion(add_noise(intervals_system,noise_level[1]), intervals_system)
+            [values[stdmean, noisy3, idx], values[stdmin, noisy3, idx], values[stdmax, noisy3, idx]], [values[drmean, noisy3, idx], values[drmin, noisy3, idx], values[drmax, noisy3, idx]] = rhythm_dispersion(add_noise(intervals_system,noise_level[2]), intervals_system)
 
             idx += 1
 
