@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 import pretty_midi as pm
 import copy
@@ -104,12 +103,6 @@ def get_loudness(midi_pitch, velocity, time):
     loudness = velocity * np.exp(-1.0 * decay_rate * time)
     return loudness
 
-
-def plot_piano_roll(pr):
-    fig = plt.figure()
-    fig = plt.imshow(pr)
-    plt.show()
-    return
 
 
 def create_folder(folder):

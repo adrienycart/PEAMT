@@ -1,6 +1,5 @@
 import numpy as np
 from .utils import precision, recall, Fmeasure, make_note_index_matrix, even_up_rolls, plot_piano_roll
-import matplotlib.pyplot as plt
 
 
 ##############################################

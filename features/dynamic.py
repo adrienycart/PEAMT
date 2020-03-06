@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import csv
 from .utils import create_folder
-from dissonant import harmonic_tone, dissonance, pitch_to_freq
+# from dissonant import harmonic_tone, dissonance, pitch_to_freq
 
 def get_pitch(full_note):
     return full_note[0]
