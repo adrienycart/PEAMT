@@ -79,3 +79,9 @@ notes_target, intervals_target = utils.get_notes_intervals(target_data)
 
 rhythm_hist_out, rhythm_hist_diff = rhythm_histogram(intervals_output,intervals_target)
 ```
+
+## More info
+
+For more info on the way perceptual data was collected and on the way the metric is trained, please refer to: **ADD LINK TO PAPER**
+
+For detailed definition of each of the features, please refer to: **ADD LINK TO FEATURE REPORT**
