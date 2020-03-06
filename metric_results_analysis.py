@@ -7,7 +7,6 @@ from scipy.stats import ttest_1samp, ttest_ind
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from statsmodels.stats.anova import anova_lm
-import pandas as pd
 
 
 plt.rcParams.update({'font.size': 13.5,'font.family' : 'serif'})

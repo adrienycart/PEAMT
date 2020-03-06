@@ -1,6 +1,4 @@
 import numpy as np
-# from scipy import stats
-from statistics import stdev
 from numpy import random
 
 SMALL_VALUE = 0.00001
@@ -15,7 +13,7 @@ def calculate_stds(data, means):
 		if len(group) <= 1:
 			stds.append(0.0)
 		else:
-			stds.append(stdev(group))
+			stds.append(np.std(group, ddof=1))
 	return stds
 
 

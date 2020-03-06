@@ -1,5 +1,4 @@
 import numpy as np
-from statistics import mean
 from .utils import precision, recall, Fmeasure, make_note_index_matrix, even_up_rolls, get_loudness
 
 ########################################
@@ -28,9 +27,9 @@ def false_negative_loudness(match, vel_target, intervals_target, dt=1):
                 for idx in range(len(intervals_target)):
                     if intervals_target[idx][0] >= intervals_target[unmatched_idx][0] - dt and intervals_target[idx][0] < intervals_target[unmatched_idx][0] + dt:
                         recent_vels.append(vel_target[idx])
-                unmatched_vels_normed.append(float(vel_target[unmatched_idx]) / mean(recent_vels))
+                unmatched_vels_normed.append(float(vel_target[unmatched_idx]) / np.mean(recent_vels))
 
-            return mean(unmatched_vels_normed)
+            return np.mean(unmatched_vels_normed)
 
 
 # TESTED
