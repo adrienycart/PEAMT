@@ -11,9 +11,10 @@ import pandas as pd
 
 
 plt.rcParams.update({'font.size': 13.5,'font.family' : 'serif'})
+plt.rcParams["figure.figsize"] = [7,6.5]
 mpl.rc('text', usetex=True)
 
-# base_folder = "results_metric"
+# base_folder = "results_metric/incorrect_high_low/20_folds"
 base_folder = "results_metric/20_folds"
 
 if '10_folds' in base_folder:
@@ -37,7 +38,7 @@ folders_to_compare = [
                         ["no_consonance",'NoConsonance'],
                         # ["no_consonance_diff",'All'],
                         # ["no_consonance_diff",'NoConsDiff'],
-                        ["no_specific_consonance",'NoSpecCons'],
+                        # ["no_specific_consonance",'NoSpecCons'],
                         # ["no_specific_consonance_6",'NoSpecCons1'],
                         # ["no_specific_consonance_out_key",'NoSpecConsOut'],
                         ["no_framewise",'NoFramewise'],

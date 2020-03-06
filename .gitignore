@@ -3,5 +3,6 @@
 data/
 plots/
 features/consonance_statistics*
+results*
 
 test.py
