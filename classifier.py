@@ -10,10 +10,10 @@ except ModuleNotFoundError:
 
 import numpy as np
 import tensorflow as tf
-try:
-    import matplotlib.pyplot as plt
-except:
-    print("No matplotlib!")
+# try:
+#     import matplotlib.pyplot as plt
+# except:
+#     print("No matplotlib!")
 
 from sklearn.decomposition import PCA
 
