@@ -1,5 +1,5 @@
 import numpy as np
-from .utils import precision, recall, Fmeasure, make_note_index_matrix, even_up_rolls, plot_piano_roll
+from .utils import precision, recall, Fmeasure, make_note_index_matrix, even_up_rolls
 
 
 ##############################################
@@ -40,7 +40,7 @@ def framewise_highest(output, target):
     i,j = np.indices(target.shape)
     mask = [i>highest]
     ### Count all false positives above highest reference note)
-    fp = np.sum(output[mask])
+    fp = np.sum(output[tuple(mask)])
 
     return precision(tp,fp),recall(tp, fn), Fmeasure(tp,fp,fn)
 
@@ -63,7 +63,7 @@ def framewise_lowest(output, target):
     i,j = np.indices(target.shape)
     mask = [i<lowest]
     ### Count all false positives above highest reference note)
-    fp = np.sum(output[mask])
+    fp = np.sum(output[tuple(mask)])
 
     return precision(tp,fp),recall(tp, fn), Fmeasure(tp,fp,fn)
 
@@ -119,7 +119,7 @@ def notewise_highest(notes_output,intervals_output,notes_target,intervals_target
         # Count all false positives that are above the highest note
         i,j = np.indices(target_refs.shape)
         higher_mask = [i>highest]
-        higher_notes_idx, count = np.unique(output_refs[higher_mask],return_counts=True)
+        higher_notes_idx, count = np.unique(output_refs[tuple(higher_mask)],return_counts=True)
         count = count[higher_notes_idx!= -1]
         higher_notes_idx = higher_notes_idx[higher_notes_idx!= -1]
         higher_notes_idx = higher_notes_idx[count/float(fs) > min_dur]
@@ -188,7 +188,7 @@ def notewise_lowest(notes_output,intervals_output,notes_target,intervals_target,
         # Count all false positives that are above the lowest note
         i,j = np.indices(target_refs.shape)
         lower_mask = [i<lowest]
-        lower_notes_idx, count = np.unique(output_refs[lower_mask],return_counts=True)
+        lower_notes_idx, count = np.unique(output_refs[tuple(lower_mask)],return_counts=True)
         count = count[lower_notes_idx!= -1]
         lower_notes_idx = lower_notes_idx[lower_notes_idx!= -1]
         # print(lower_notes_idx, count)

@@ -5,7 +5,6 @@ import pretty_midi as pm
 import mir_eval
 import pickle
 # import matplotlib.pyplot as plt
-from classifier_utils import import_features
 import features.utils as utils
 from features.benchmark import framewise, notewise
 from features.high_low_voice import framewise_highest, framewise_lowest, notewise_highest, notewise_lowest
@@ -47,7 +46,7 @@ class PEAMT():
 
     def __init__(self,parameters='model_parameters/PEAMT.pkl'):
 
-        parameters = pickle.load(open(parameters, "rb"))
+        parameters = pickle.load(open(parameters, "rb"), encoding='latin1')
 
         self.weight = parameters['best_weights']
         self.bias = parameters['best_bias']
@@ -85,7 +84,7 @@ class PEAMT():
         notes_target, intervals_target, vel_target = utils.get_notes_intervals(midi_sustain,with_vel=True)
         notes_output, intervals_output = utils.get_notes_intervals(est_midi)
 
-        return self.evaluate(notes_output, intervals_output, notes_target, intervals_target,intervals_target_no_pedal, vel_target)
+        return self.evaluate(notes_output, intervals_output, notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal)
 
 
     def evaluate(self,notes_output, intervals_output, notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal):
@@ -185,6 +184,6 @@ class PEAMT():
 
                 }
 
-        feature_list = import_features(results_dict, ALL_FEATURES)
+        feature_list = utils.import_features(results_dict, ALL_FEATURES)
 
         return self.compute_from_features(feature_list)

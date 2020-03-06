@@ -258,3 +258,31 @@ def apply_sustain_control_changes(midi):
     new_midi.instruments.append(new_instr)
 
     return new_midi
+
+
+def import_features(results,features_to_use):
+
+    all_feat = []
+    for feat in features_to_use:
+        if feat == 'valid_cons':
+            value_hut78 = results["cons_hut78_output"]
+            value_har18 = results["cons_har18_output"]
+            value_har19 = results["cons_har19_output"]
+
+            value = value_hut78[:-1]+value_har18[0:2]+value_har18[3:]+value_har19[:-2]
+
+        else:
+            value = results[feat]
+        if type(value) is tuple:
+            all_feat += list(value)
+        elif type(value) is list:
+            all_feat += value
+        elif type(value) is float:
+            all_feat += [np.float64(value)]
+        else:
+            all_feat += [value]
+
+    all_feat = [float(elt) for elt in all_feat]
+
+
+    return all_feat

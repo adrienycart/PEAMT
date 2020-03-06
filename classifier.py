@@ -2,18 +2,23 @@ from sacred import Experiment
 import codecs
 import os
 import random
-import cPickle as pickle
+try:
+    # Python 2
+    import cPickle as pickle
+except ModuleNotFoundError:
+    import pickle
 
 import numpy as np
 import tensorflow as tf
 try:
     import matplotlib.pyplot as plt
 except:
-    print "No matplotlib!"
+    print("No matplotlib!")
 
 from sklearn.decomposition import PCA
 
 import classifier_utils as utils
+from features.utils import import_features
 
 MAX_ANSWERS=4
 
@@ -291,9 +296,14 @@ def train_classif(cfg):
     answers = np.genfromtxt(filecp,dtype=object,delimiter=";")
     answers = answers[1:,:]
 
+    change_encoding = lambda x:x.decode('utf-8')
+    change_encoding = np.vectorize(change_encoding)
+    answers = change_encoding(answers)
+
     filecp = codecs.open(cfg['user_csv_path'], encoding = 'utf-8')
     users = np.genfromtxt(filecp,dtype=object,delimiter=";")
     users = users[1:,:]
+    users = change_encoding(users)
 
     results_dict = {}
 
@@ -329,7 +339,7 @@ def train_classif(cfg):
     labels = utils.get_feature_labels(features_to_use)
     N_FEATURES = len(labels)
 
-    print 'Total features:', N_FEATURES, '(removed:',len(utils.get_feature_labels(ALL_FEATURES))-N_FEATURES,')'
+    print('Total features:', N_FEATURES, '(removed:',len(utils.get_feature_labels(ALL_FEATURES))-N_FEATURES,')')
 
 
     #### Graph definition
@@ -382,8 +392,8 @@ def train_classif(cfg):
         notewise2 += [results2["notewise_On_50"][-1]]
         goldmsi += [float(users[users[:,0]==row[4],5])]
 
-        features1 += [utils.import_features(results1,features_to_use)]
-        features2 += [utils.import_features(results2,features_to_use)]
+        features1 += [import_features(results1,features_to_use)]
+        features2 += [import_features(results2,features_to_use)]
         ratings += [row[5]]
 
     features1 = np.array(features1,dtype=float)
@@ -618,7 +628,7 @@ def train_classif(cfg):
 
 
         for i in range(N_REPEATS):
-            print save_destination, "fold",fold,"repeat",i, np.mean(repeat_agreement)
+            print(save_destination, "fold",fold,"repeat",i, np.mean(repeat_agreement))
 
             valid_costs = []
             train_costs = []
@@ -735,9 +745,9 @@ def train_classif(cfg):
 
 
 
-            print "average agreement new metric:", np.round(agreement_metric,3), "F-measure:", np.round(agreement_F1,3)
-            print "average agreement new metric conf.:", np.round(agreement_metric_conf,3), "F-measure conf.:", np.round(agreement_F1_conf,3)
-            print "average agreement new metric agg.:", np.round(agreement_metric_agg,3), "F-measure agg.:", np.round(agreement_F1_agg,3)
+            print("average agreement new metric:", np.round(agreement_metric,3), "F-measure:", np.round(agreement_F1,3))
+            print("average agreement new metric conf.:", np.round(agreement_metric_conf,3), "F-measure conf.:", np.round(agreement_F1_conf,3))
+            print("average agreement new metric agg.:", np.round(agreement_metric_agg,3), "F-measure agg.:", np.round(agreement_F1_agg,3))
             # print repeat_agreement
 
 
