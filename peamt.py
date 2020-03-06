@@ -88,7 +88,7 @@ class PEAMT():
         return self.evaluate(notes_output, intervals_output, notes_target, intervals_target,intervals_target_no_pedal, vel_target)
 
 
-    def evaluate(self,notes_output, intervals_output, notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal, vel_target_no_pedal):
+    def evaluate(self,notes_output, intervals_output, notes_target, intervals_target, vel_target, notes_target_no_pedal, intervals_target_no_pedal):
 
         ### Validate values
         mir_eval.transcription.validate_intervals(intervals_target,intervals_output)
