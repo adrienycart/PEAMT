@@ -12,7 +12,7 @@ Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce. "Investigating the 
        Title = {Investigating the Perceptual Validity of Evaluation Metrics for Automatic Piano Music Transcription},       
     }  
 ```
-# Getting started
+## Getting started
 
 This library is compatible with Python 2.7 and 3.6 **TODO: check compatibility**
 
@@ -20,7 +20,7 @@ To install the dependencies necessary to run the evaluation, run : ```$ pip inst
 
 To install the dependencies necessary to train your own metric, run: ```$ pip install -r requirements_training.txt```
 
-# Evaluating some outputs
+## Evaluating some outputs
 
 Here is a code sample to evaluate some outputs:
 
@@ -43,7 +43,7 @@ Some useful processing functions can be found in ```features.utils```, such as
 ```apply_sustain_control_changes``` and ```get_notes_intervals```.
 
 
-# Training a new metric
+## Training a new metric
 
 
 To train a new metric, you first need to download the ratings and MIDI files from: **ADD LINK WHEN DATA IS UPLOADED**
