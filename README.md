@@ -72,7 +72,7 @@ output_filename = 'output.mid'
 target_filename = 'target.mid'
 
 output_data = pm.PrettyMIDI(output_filename)
-target_data = pm.PrettyMIDI(output_filename)
+target_data = pm.PrettyMIDI(target_filename)
 
 notes_output, intervals_output = utils.get_notes_intervals(output_data)
 notes_target, intervals_target = utils.get_notes_intervals(target_data)
