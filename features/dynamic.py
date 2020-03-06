@@ -1,6 +1,5 @@
 import numpy as np
 import os
-from statistics import stdev
 import pandas as pd
 import csv
 from .utils import create_folder
@@ -155,8 +154,8 @@ def polyphony_level(notes_output, intervals_output, notes_target, intervals_targ
     # unweighted mean and stds.
     mean_target = np.mean(polyphony_levels_target)
     mean_output = np.mean(polyphony_levels_output)
-    std_target = stdev(polyphony_levels_target)
-    std_output = stdev(polyphony_levels_output)
+    std_target = np.std(polyphony_levels_target, ddof=1)
+    std_output = np.std(polyphony_levels_output, ddof=1)
 
     # import matplotlib.pyplot as plt
     # plt.plot(event_times_target, polyphony_levels_target + [0], label='target')
