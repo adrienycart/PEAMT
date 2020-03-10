@@ -14,7 +14,7 @@ Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce. "Investigating the 
 ```
 ## Getting started
 
-This library is compatible with Python 2.7 and 3.6 **TODO: check compatibility**
+This library is compatible with Python 2.7 and 3.6.
 
 To install the dependencies necessary to run the evaluation, run : ```$ pip install -r requirements.txt```
 
