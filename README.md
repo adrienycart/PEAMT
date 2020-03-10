@@ -59,7 +59,7 @@ To use the obtained parameters to evaluate some outputs, use: ```eval = PEAMT(pa
 
 # Using individual features
 
-The individual features can also be used: **TODO: Make sure this is actually working**
+The individual features can also be used:
 
 ```
 import pretty_midi as pm
