@@ -57,7 +57,7 @@ To run the script, run ```$ python classifier with <your_config_name>```.
 
 To use the obtained parameters to evaluate some outputs, use: ```eval = PEAMT(parameters=<your_parameters_filepath>)```.
 
-# Using individual features
+## Using individual features
 
 The individual features can also be used:
 
