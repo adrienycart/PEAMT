@@ -94,44 +94,44 @@ magnitude.
 It appears that the most important features are the notewise onset-only F-measure, followed by rhythm features and other benchmark metrics.
 Framewise mistakes in the lowest voice also seem to have some importance in the end result.
 
-| Feature ID        | Weight           |
-| -------------: |-------------|
-| notewise_On_F | 0.6163901 |
-| rhythm_disp_drift_mean | 0.58185416 |
-| rhythm_disp_drift_max | -0.51437545 |
-| framewise_R | 0.3728488 |
-| rhythm_disp_std_mean | -0.36873978 |
-| rhythm_hist_out | -0.28920627 |
-| low_f_F | -0.27877852 |
-| notewise_OnOff_R | -0.25945878 |
-| framewise_F | 0.21865314 |
-| rhythm_hist_diff | 0.21851824 |
-| low_f_R | 0.1989684 |
-| notewise_On_R | -0.1954612 |
-| low_f_P | 0.19219641 |
-| poly_diff_mean | 0.18691508 |
-| rhythm_disp_drift_min | -0.18283454 |
-| high_n_F | 0.16963542 |
-| merge_fp | -0.16701007 |
-| high_f_F | -0.15762798 |
-| notewise_OnOff_F | 0.1448518 |
-| poly_diff_std | -0.14053902 |
-| merge_all | 0.109077565 |
-| loud_ratio_fn | -0.10902009 |
-| high_f_R | 0.10647323 |
-| low_n_F | -0.10201532 |
-| low_n_R | 0.09830448 |
-| repeat_fp | -0.097474664 |
-| high_n_P | 0.08767299 |
-| poly_diff_min | -0.07279301 |
-| loud_fn | -0.07112731 |
-| notewise_On_P | -0.060689207 |
-| notewise_OnOff_P | 0.05645829 |
-| poly_diff_max | 0.05339441 |
-| low_n_P | 0.047426596 |
-| high_f_P | -0.045074914 |
-| high_n_R | 0.041347794 |
-| rhythm_disp_std_max | 0.034391385 |
-| framewise_P | -0.024282124 |
-| rhythm_disp_std_min | 0.012041504 |
-| repeat_all | -0.0018782051 |
+|Rank | Feature ID        | Weight           |
+|-----| -------------: |-------------|
+| 0 | notewise_On_F | 0.6163901 |
+| 1 | rhythm_disp_drift_mean | 0.58185416 |
+| 2 | rhythm_disp_drift_max | -0.51437545 |
+| 3 | framewise_R | 0.3728488 |
+| 4 | rhythm_disp_std_mean | -0.36873978 |
+| 5 | rhythm_hist_out | -0.28920627 |
+| 6 | low_f_F | -0.27877852 |
+| 7 | notewise_OnOff_R | -0.25945878 |
+| 8 | framewise_F | 0.21865314 |
+| 9 | rhythm_hist_diff | 0.21851824 |
+| 10 | low_f_R | 0.1989684 |
+| 11 | notewise_On_R | -0.1954612 |
+| 12 | low_f_P | 0.19219641 |
+| 13 | poly_diff_mean | 0.18691508 |
+| 14 | rhythm_disp_drift_min | -0.18283454 |
+| 15 | high_n_F | 0.16963542 |
+| 16 | merge_fp | -0.16701007 |
+| 17 | high_f_F | -0.15762798 |
+| 18 | notewise_OnOff_F | 0.1448518 |
+| 19 | poly_diff_std | -0.14053902 |
+| 20 | merge_all | 0.109077565 |
+| 21 | loud_ratio_fn | -0.10902009 |
+| 22 | high_f_R | 0.10647323 |
+| 23 | low_n_F | -0.10201532 |
+| 24 | low_n_R | 0.09830448 |
+| 25 | repeat_fp | -0.097474664 |
+| 26 | high_n_P | 0.08767299 |
+| 27 | poly_diff_min | -0.07279301 |
+| 28 | loud_fn | -0.07112731 |
+| 29 | notewise_On_P | -0.060689207 |
+| 30 | notewise_OnOff_P | 0.05645829 |
+| 31 | poly_diff_max | 0.05339441 |
+| 32 | low_n_P | 0.047426596 |
+| 33 | high_f_P | -0.045074914 |
+| 34 | high_n_R | 0.041347794 |
+| 35 | rhythm_disp_std_max | 0.034391385 |
+| 36 | framewise_P | -0.024282124 |
+| 37 | rhythm_disp_std_min | 0.012041504 |
+| 38 | repeat_all | -0.0018782051 |
