@@ -28,8 +28,8 @@ ALL_FEATURES = [
                  "loud_fn",
                  "loud_ratio_fn",
 
-                 "out_key",
-                 "out_key_bin",
+                 # "out_key",
+                 # "out_key_bin",
 
                  "repeat",
                  "merge",

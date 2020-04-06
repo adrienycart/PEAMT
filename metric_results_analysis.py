@@ -14,7 +14,7 @@ plt.rcParams["figure.figsize"] = [7,6.5]
 mpl.rc('text', usetex=True)
 
 # base_folder = "results_metric/incorrect_high_low/20_folds"
-base_folder = "results_metric/20_folds"
+base_folder = "results_metric/20_folds_no_consonance"
 
 if '10_folds' in base_folder:
     n_folds=10
@@ -34,15 +34,17 @@ folders_to_compare = [
                         ["no_poly",'NoPoly'],
                         ["no_repeat",'NoRepeat'],
                         ["no_rhythm",'NoRhythm'],
-                        ["no_consonance",'NoConsonance'],
+                        # ["no_consonance",'NoConsonance'],
                         # ["no_consonance_diff",'All'],
                         # ["no_consonance_diff",'NoConsDiff'],
                         # ["no_specific_consonance",'NoSpecCons'],
                         # ["no_specific_consonance_6",'NoSpecCons1'],
                         # ["no_specific_consonance_out_key",'NoSpecConsOut'],
+                        ["no_specific_out_key",'NoSpecOut'],
                         ["no_framewise",'NoFramewise'],
                         # ["no_consonance_invalid",'NoInvalidCons'],
-                        # ["no_useless",'NoUseless'],
+                        # ["no_useless",'NoNegative'],
+                        # ["no_non_significant",'NoNonSig'],
 
                         ]
 
@@ -66,6 +68,30 @@ for i in range(n_folds):
     results_F1 += [reference_results['fold'+str(i)]['agreement_F1']]
     results_F1_conf += [reference_results['fold'+str(i)]['agreement_F1_conf']]
     results_F1_agg += [reference_results['fold'+str(i)]['agreement_F1_agg']]
+
+
+
+### USING A THRESHOLD OF 75ms
+# results_F1_conf = [0.887323943662 ,
+# 0.864864864865 ,
+# 0.869047619048 ,
+# 0.832214765101 ,
+# 0.925 ,
+# 0.848920863309 ,
+# 0.865671641791 ,
+# 0.912621359223 ,
+# 0.914473684211 ,
+# 0.867549668874 ,
+# 0.872727272727 ,
+# 0.892045454545 ,
+# 0.932835820896 ,
+# 0.909836065574 ,
+# 0.905882352941 ,
+# 0.860294117647 ,
+# 0.865671641791 ,
+# 0.86524822695 ,
+# 0.877697841727 ,
+# 0.870588235294 ,]
 
 
 p_values_all = []
@@ -113,6 +139,8 @@ for folder,name in folders_to_compare:
     print "p_value_all_features", p_value_all_features
     print "p_value_all_features_conf", p_value_all_features_conf
     print "p_value_all_features_agg", p_value_all_features_agg
+
+
 
 
 ##### PLOT RESULTS

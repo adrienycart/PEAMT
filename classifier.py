@@ -63,12 +63,12 @@ ALL_FEATURES = [
                  # "cons_har18_diff" ,
                  # "cons_har19_diff" ,
 
-                 "valid_cons",
+                 # "valid_cons",
                  ]
 
 @ex.config
 def cfg():
-    cfg = {"base_folder" : "results_metric", # Base folder for model checkpoints
+    cfg = {"base_folder" : "results_metric/20_folds_no_consonance", # Base folder for model checkpoints
            'user_csv_path': 'data/db_csv/user_data.csv',
            'answers_csv_path': 'data/db_csv/answers_data.csv',
 
@@ -95,19 +95,44 @@ def cfg():
 @ex.named_config
 def export_metric():
     cfg = {'features_to_remove': [
-                     "semitone_f",
-                     "octave_f",
-                     "third_harmonic_f",
-                     "semitone_n",
-                     "octave_n",
-                     "third_harmonic_n",
-                     "valid_cons",
+                    "semitone_f",
+                    "octave_f",
+                    "third_harmonic_f",
+                    "semitone_n",
+                    "octave_n",
+                    "third_harmonic_n",
+
+                    "out_key",
+                    "out_key_bin",
+
+                      ],
+            'n_folds':None, #None uses all available data for training, validation, and testing
+            'n_repeats':20,
+            'base_folder': '.',
+            'config_folder':'model_parameters',
+            'pkl_name':'PEAMT.pkl',
+            }
+
+@ex.named_config
+def export_metric_lite():
+    cfg = {'features_to_use': [
+                    "framewise_0.01",
+                    "notewise_On_50",
+                    "notewise_OnOff_50_0.2",
+
+                    "repeat",
+                    "merge",
+
+                    "rhythm_hist",
+                    "rhythm_disp_std",
+                    "rhythm_disp_drift",
+
                       ],
             'n_folds':None, #None uses all available data for training, validation, and testing
             'n_repeats':1,
             'base_folder': '.',
             'config_folder':'model_parameters',
-            'pkl_name':'PEAMT.pkl',
+            'pkl_name':'PEAMT_lite.pkl',
             }
 
 @ex.named_config
@@ -282,6 +307,71 @@ def no_specific_consonance():
 
                              "valid_cons",
                              ],
+           }
+
+@ex.named_config
+def no_specific_out_key():
+    cfg = {
+           "config_folder": "no_specific_out_key",
+            'features_to_remove': [
+                             "semitone_f",
+                             "octave_f",
+                             "third_harmonic_f",
+                             "semitone_n",
+                             "octave_n",
+                             "third_harmonic_n",
+
+                             "out_key",
+                             "out_key_bin",
+                             ],
+           }
+
+@ex.named_config
+def no_negative():
+    cfg = {
+           "config_folder": "no_negative",
+            'features_to_use': [
+                             "framewise_0.01",
+                             "notewise_On_50",
+                             "notewise_OnOff_50_0.2",
+
+                             # "high_f",
+                             # "low_f",
+                             # "high_n",
+                             # "low_n",
+
+                             # "loud_fn",
+                             # "loud_ratio_fn",
+
+                             # "out_key",
+                             # "out_key_bin",
+
+                             "repeat",
+                             "merge",
+
+                             # "semitone_f",
+                             # "octave_f",
+                             # "third_harmonic_f",
+                             # "semitone_n",
+                             # "octave_n",
+                             # "third_harmonic_n",
+
+                             # "poly_diff",
+
+                             "rhythm_hist",
+                             "rhythm_disp_std",
+                             "rhythm_disp_drift",
+
+                             # "cons_hut78_output",
+                             # "cons_har18_output",
+                             # "cons_har19_output",
+                             #
+                             # "cons_hut78_diff" ,
+                             # "cons_har18_diff" ,
+                             # "cons_har19_diff" ,
+
+                             # "valid_cons",
+                             ]
            }
 
 
@@ -751,7 +841,7 @@ def train_classif(cfg):
             # print repeat_agreement
 
 
-        if N_REPEATS > 1:
+        if N_REPEATS > 1 and cfg['n_folds'] is not None:
             results_dict = {'repeat_agreement':repeat_agreement,
                             'repeat_agreement_agg':repeat_agreement_agg,
                             'repeat_agreement_conf':repeat_agreement_conf,
@@ -763,14 +853,15 @@ def train_classif(cfg):
                             'data_mean':data_mean,
                             'data_std':data_std,}
         else:
-            results_dict = {'agreement':repeat_agreement[0],
-                            'agreement_agg':repeat_agreement_agg[0],
-                            'agreement_conf':repeat_agreement_conf[0],
+            idx = np.argmax(repeat_agreement_conf)
+            results_dict = {'agreement':repeat_agreement[idx],
+                            'agreement_agg':repeat_agreement_agg[idx],
+                            'agreement_conf':repeat_agreement_conf[idx],
                             'agreement_F1': agreement_F1,
                             'agreement_F1_agg': agreement_F1_agg,
                             'agreement_F1_conf': agreement_F1_conf,
-                            'best_weights':repeat_best_weights[0],
-                            'best_bias':repeat_best_bias[0],
+                            'best_weights':repeat_best_weights[idx],
+                            'best_bias':repeat_best_bias[idx],
                             'data_mean':data_mean,
                             'data_std':data_std,}
 
