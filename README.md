@@ -3,13 +3,14 @@
 This repository contains code to train and run PEAMT, a Perceptual Evaluation metric for Automatic Music Transcription.
 If you use any of this, please cite:
 
-Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce. "Investigating the Perceptual Validity of Evaluation Metrics for Automatic Piano Music Transcription", _Transactions of the International Society for Music Information Retrieval (TISMIR)_, Under Review.
+Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce. "Investigating the Perceptual Validity of Evaluation Metrics for Automatic Piano Music Transcription", _Transactions of the International Society for Music Information Retrieval (TISMIR)_, Accepted, 2020.
 
 ```  
     @article{ycart2019PEAMT,
        Author = {Ycart, Adrien and Liu, Lele and Benetos, Emmanouil and Pearce, Marcus},    
        Booktitle = {Transactions of the International Society for Music Information Retrieval (TISMIR)},    
        Title = {Investigating the Perceptual Validity of Evaluation Metrics for Automatic Piano Music Transcription},       
+       Year = {2020},
     }  
 ```
 ## Getting started
@@ -46,7 +47,7 @@ Some useful processing functions can be found in ```features.utils```, such as
 ## Training a new metric
 
 
-To train a new metric, you first need to download the ratings and MIDI files from: **ADD LINK WHEN DATA IS UPLOADED**
+To train a new metric, you first need to download the ratings and MIDI files [at this address](https://zenodo.org/record/3746863).
 Then, run ```$ python export_features.py <MIDI_files_location> <answers_csv_path> <output_folder>``` to precompute the features and save them, for each pair of (target, output).
 
 Then use the script ```classifier.py```.
@@ -82,9 +83,9 @@ rhythm_hist_out, rhythm_hist_diff = rhythm_histogram(intervals_output,intervals_
 
 ## More info
 
-For more info on the way perceptual data was collected and on the way the metric is trained, please refer to: **ADD LINK TO PAPER**
+For more info on the way perceptual data was collected and on the way the metric is trained, please refer to [the corresponding paper](TODO).
 
-For detailed definition of each of the features, please refer to: **ADD LINK TO FEATURE REPORT**
+For a detailed definition of each of the features, please refer to: [Technical report - Musical Features for Automatic Music Transcription Evaluation](TODO)
 
 
 ## Weights of features in the released metric
