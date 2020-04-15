@@ -107,7 +107,7 @@ def export_metric():
 
                       ],
             'n_folds':None, #None uses all available data for training, validation, and testing
-            'n_repeats':20,
+            'n_repeats':20, #n_repeats > 1 trains several times the metric and saves the one that reaches the best agreement_conf
             'base_folder': '.',
             'config_folder':'model_parameters',
             'pkl_name':'PEAMT.pkl',
