@@ -85,7 +85,7 @@ rhythm_hist_out, rhythm_hist_diff = rhythm_histogram(intervals_output,intervals_
 
 For more info on the way perceptual data was collected and on the way the metric is trained, please refer to [the corresponding paper](TODO).
 
-For a detailed definition of each of the features, please refer to: [Technical report - Musical Features for Automatic Music Transcription Evaluation](TODO)
+For a detailed definition of each of the features, please refer to: [Technical report - Musical Features for Automatic Music Transcription Evaluation](https://arxiv.org/abs/2004.07171)
 
 
 ## Weights of features in the released metric
