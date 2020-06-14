@@ -3,7 +3,7 @@
 This repository contains code to train and run PEAMT, a Perceptual Evaluation metric for Automatic Music Transcription.
 If you use any of this, please cite:
 
-Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce. "Investigating the Perceptual Validity of Evaluation Metrics for Automatic Piano Music Transcription", _Transactions of the International Society for Music Information Retrieval (TISMIR)_, Accepted, 2020.
+Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce, 2020. "Investigating the Perceptual Validity of Evaluation Metrics for Automatic Piano Music Transcription", _Transactions of the International Society for Music Information Retrieval (TISMIR)_, 3(1), pp.68–81.
 
 ```  
     @article{ycart2019PEAMT,
@@ -11,6 +11,10 @@ Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce. "Investigating the 
        Booktitle = {Transactions of the International Society for Music Information Retrieval (TISMIR)},    
        Title = {Investigating the Perceptual Validity of Evaluation Metrics for Automatic Piano Music Transcription},       
        Year = {2020},
+       Volume = {3},
+       Issue = {1},
+       Pages = {68--81},
+       DOI = {http://doi.org/10.5334/tismir.57},
     }  
 ```
 ## Getting started
