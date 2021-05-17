@@ -47,11 +47,11 @@ class PEAMT():
     def __init__(self,parameters='model_parameters/PEAMT.pkl'):
 
         try:
-            # Python 2
-            parameters = pickle.load(open(parameters, "rb"))
-        except TypeError:
             # Python 3
             parameters = pickle.load(open(parameters, "rb"), encoding='latin1')
+        except TypeError:
+            # Python 2
+            parameters = pickle.load(open(parameters, "rb"))
 
         self.weight = parameters['best_weights']
         self.bias = parameters['best_bias']
