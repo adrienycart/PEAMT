@@ -23,7 +23,7 @@ This library is compatible with Python 2.7 and 3.6.
 
 ### Install from pip
 
-Simply run: ``$ pip install peamt````
+Simply run: ```$ pip install peamt```
 
 This module will allow you to run PEAMT to evaluate some systems, but not to re-train the metric. To do so, you need to run the code from sources.
 
