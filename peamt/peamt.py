@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 import numpy as np
 import math
@@ -5,16 +6,17 @@ import pretty_midi as pm
 import mir_eval
 import pickle
 # import matplotlib.pyplot as plt
-import features.utils as utils
-from features.benchmark import framewise, notewise
-from features.high_low_voice import framewise_highest, framewise_lowest, notewise_highest, notewise_lowest
-from features.loudness import false_negative_loudness, loudness_ratio_false_negative
-from features.out_key import make_key_mask, out_key_errors, out_key_errors_binary_mask
-from features.polyphony import polyphony_level_diff
-from features.repeat_merge import repeated_notes, merged_notes
-from features.specific_pitch import specific_pitch_framewise, specific_pitch_notewise
-from features.rhythm import rhythm_histogram, rhythm_dispersion
+import peamt.features.utils as utils
+from peamt.features.benchmark import framewise, notewise
+from peamt.features.high_low_voice import framewise_highest, framewise_lowest, notewise_highest, notewise_lowest
+from peamt.features.loudness import false_negative_loudness, loudness_ratio_false_negative
+from peamt.features.out_key import make_key_mask, out_key_errors, out_key_errors_binary_mask
+from peamt.features.polyphony import polyphony_level_diff
+from peamt.features.repeat_merge import repeated_notes, merged_notes
+from peamt.features.specific_pitch import specific_pitch_framewise, specific_pitch_notewise
+from peamt.features.rhythm import rhythm_histogram, rhythm_dispersion
 
+DEFAULT_PARAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)),'model_parameters/PEAMT.pkl')
 
 ALL_FEATURES = [
                  "framewise_0.01",
@@ -44,7 +46,7 @@ ALL_FEATURES = [
 
 class PEAMT():
 
-    def __init__(self,parameters='model_parameters/PEAMT.pkl'):
+    def __init__(self,parameters=DEFAULT_PARAMS):
 
         try:
             # Python 3

@@ -1,10 +1,14 @@
 *.pyc
+*.egg-info
 
+build/
+dist/
 data/
 plots/
-features/consonance_statistics*
+peamt/features/consonance_statistics*
 results*
 
-venv/
+venv*
+
 
 test.py

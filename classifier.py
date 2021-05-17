@@ -18,7 +18,7 @@ import tensorflow as tf
 from sklearn.decomposition import PCA
 
 import classifier_utils as utils
-from features.utils import import_features
+from peamt.features.utils import import_features
 
 MAX_ANSWERS=4
 

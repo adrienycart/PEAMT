@@ -21,6 +21,14 @@ Adrien Ycart, Lele Liu, Emmanouil Benetos and Marcus Pearce, 2020. ["Investigati
 
 This library is compatible with Python 2.7 and 3.6.
 
+### Install from pip
+
+Simply run: ``$ pip install peamt````
+
+This module will allow you to run PEAMT to evaluate some systems, but not to re-train the metric. To do so, you need to run the code from sources.
+
+### Run from sources
+
 To install the dependencies necessary to run the evaluation, run : ```$ pip install -r requirements.txt```
 
 To install the dependencies necessary to train your own metric, run: ```$ pip install -r requirements_training.txt```
@@ -44,7 +52,7 @@ value = eval.evaluate_from_midi(target_filename,output_filename)
 Make sure the target filename contains correct velocities and sustain pedal activations (control change &#35;64).
 
 To run directly from lists of notes, use ```eval.evaluate```.
-Some useful processing functions can be found in ```features.utils```, such as
+Some useful processing functions can be found in ```peamt.features.utils```, such as
 ```apply_sustain_control_changes``` and ```get_notes_intervals```.
 
 
@@ -69,8 +77,8 @@ The individual features can also be used:
 ```
 import pretty_midi as pm
 
-from features.rhythm import rhythm_histogram
-import features.utils as utils
+from peamt.features.rhythm import rhythm_histogram
+import peamt.features.utils as utils
 
 
 output_filename = 'output.mid'

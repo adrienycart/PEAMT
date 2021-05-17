@@ -3,9 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pretty_midi as pm
 import mir_eval
-import features.utils as utils
-from features.rhythm import rhythm_histogram, rhythm_dispersion
-from features.utils import get_time, str_to_bar_beat
+import peamt.features.utils as utils
+from peamt.features.rhythm import rhythm_histogram, rhythm_dispersion
+from peamt.features.utils import get_time, str_to_bar_beat
 
 import warnings
 warnings.filterwarnings("ignore")

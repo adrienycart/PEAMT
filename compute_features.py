@@ -2,12 +2,12 @@ import os
 import numpy as np
 import pretty_midi as pm
 import mir_eval
-import features.utils as utils
-from features.benchmark import framewise
-from features.high_low_voice import framewise_highest, framewise_lowest,notewise_highest, notewise_lowest
-from features.loudness import false_negative_loudness
-from features.out_key import out_key_errors, out_key_errors_binary_mask
-from features.repeat_merge import repeated_notes, merged_notes
+import peamt.features.utils as utils
+from peamt.features.benchmark import framewise
+from peamt.features.high_low_voice import framewise_highest, framewise_lowest,notewise_highest, notewise_lowest
+from peamt.features.loudness import false_negative_loudness
+from peamt.features.out_key import out_key_errors, out_key_errors_binary_mask
+from peamt.features.repeat_merge import repeated_notes, merged_notes
 
 
 
